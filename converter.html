@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MUR to AUD</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="https://dathnoth.github.io/currencyswap/icon-mru-aud.png">
+    <link rel="apple-touch-icon" href="https://dathnoth.github.io/currencyswap/icon-mru-aud.png">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+    <style>
+        :root {
+            --bg-color: #121212;
+            --text-color: #e0e0e0;
+            --input-bg: #1e1e1e;
+            --input-focus-bg: #252525;
+            --accent-color: #4CAF50;
+            --border-color: #333;
+        }
+
+        .test {display: none;}
+
+        body { 
+            font-family: -apple-system, sans-serif; 
+            padding: 60px 20px;
+            text-align: center; 
+            background: var(--bg-color); 
+            color: var(--text-color);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h2 { margin-bottom: 30px; font-weight: 600; font-size: 1.6rem; opacity: 0.9; }
+
+        .currency-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 5px;
+        }
+
+        .flag { font-size: 1.2rem; }
+        .label { font-size: 0.8rem; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+
+        .input-group {
+            display: flex;
+            align-items: stretch;
+            justify-content: center;
+            gap: 12px;
+            width: 100%;
+            max-width: 350px;
+            margin: 10px 0;
+        }
+
+        input { 
+            flex: 1;
+            padding: 15px; 
+            font-size: 2.2rem; 
+            background: var(--input-bg);
+            color: white;
+            border-radius: 12px; 
+            border: 1px solid var(--border-color);
+            text-align: center;
+            outline: none;
+            min-width: 0;
+            caret-color: transparent;
+            transition: all 0.2s ease;
+        }
+
+        input:focus { 
+            border-color: var(--accent-color);
+            background: var(--input-focus-bg);
+        }
+
+        .swap-btn {
+            background: #2a2a2a;
+            color: #fff;
+            border: 1px solid #444;
+            width: 65px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.6rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            flex-shrink: 0;
+            padding: 0;
+        }
+
+        .swap-btn:active { background: #333; transform: scale(0.95); }
+
+        #result { 
+            font-size: 3.8rem; 
+            font-weight: bold; 
+            margin-top: 30px;
+            color: var(--accent-color);
+        }
+
+        .rate-container { margin-top: 40px; }
+        .rate { font-size: 0.85rem; color: #555; margin-bottom: 4px; }
+        .timestamp { font-size: 0.7rem; color: #444; font-style: italic; }
+    </style>
+</head>
+<body>
+
+    <h2 id="dirHeading">MUR to AUD</h2>
+    
+    <div class="currency-row">
+        <span id="fromFlag" class="flag">🇲🇺</span>
+        <span class="label" id="dirLabel">Mauritian Rupees</span>
+    </div>
+    
+    <div class="input-group">
+        <input type="text" id="inputVal" placeholder="0" oninput="formatAndConvert()" inputmode="decimal">
+        <button class="swap-btn" onclick="swap()" title="Swap Direction">⇅</button>
+    </div>
+
+    <div class="currency-row">
+        <span id="toFlag" class="flag">🇦🇺</span>
+        <span class="label" id="toLabel">Australian Dollars</span>
+    </div>
+
+    <div id="result">$ 0</div>
+    
+    <div class="rate-container">
+        <p class="rate" id="rateDisplay">Fetching live rates...</p>
+        <p class="timestamp" id="timeDisplay"></p>
+    </div>
+
+    <script>
+        let rateMURtoAUD = 0.0306; 
+        let isMURtoAUD = true;
+
+        async function getRate() {
+            try {
+                const response = await fetch('https://api.exchangerate-api.com/v4/latest/MUR');
+                const data = await response.json();
+                rateMURtoAUD = data.rates.AUD;
+                updateUI();
+            } catch (e) {
+                document.getElementById('rateDisplay').innerText = "Using offline rate";
+            }
+        }
+
+        function formatAndConvert() {
+            const input = document.getElementById('inputVal');
+            let value = input.value.replace(/[^0-9.]/g, '');
+            
+            if (value) {
+                let parts = value.split('.');
+                parts[0] = parseInt(parts[0]).toLocaleString();
+                input.value = parts.join('.');
+            }
+            
+            convert();
+        }
+
+        function swap() {
+            isMURtoAUD = !isMURtoAUD;
+            document.getElementById('dirHeading').innerText = isMURtoAUD ? "MUR to AUD" : "AUD to MUR";
+            document.getElementById('dirLabel').innerText = isMURtoAUD ? "Mauritian Rupees" : "Australian Dollars";
+            document.getElementById('toLabel').innerText = isMURtoAUD ? "Australian Dollars" : "Mauritian Rupees";
+            document.getElementById('fromFlag').innerText = isMURtoAUD ? "🇲🇺" : "🇦🇺";
+            document.getElementById('toFlag').innerText = isMURtoAUD ? "🇦🇺" : "🇲🇺";
+            updateUI();
+        }
+
+        function updateUI() {
+            const currentRate = isMURtoAUD ? rateMURtoAUD : (1 / rateMURtoAUD);
+            const text = isMURtoAUD ? 
+                `1 MUR = ${rateMURtoAUD.toFixed(4)} AUD` : 
+                `1 AUD = ${(1/rateMURtoAUD).toFixed(2)} MUR`;
+            document.getElementById('rateDisplay').innerText = `Live Rate: ${text}`;
+            
+            // Format 12hr time without seconds
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], { 
+                hour: 'numeric', 
+                minute: '2-digit', 
+                hour12: true 
+            });
+            document.getElementById('timeDisplay').innerText = `Last updated: ${timeString}`;
+            
+            convert();
+        }
+
+        function convert() {
+            const rawVal = document.getElementById('inputVal').value.replace(/,/g, '');
+            const val = parseFloat(rawVal);
+            
+            if (!val || isNaN(val)) {
+                 document.getElementById('result').innerText = isMURtoAUD ? "$ 0" : "Rs 0";
+                 return;
+            }
+
+            const currentRate = isMURtoAUD ? rateMURtoAUD : (1 / rateMURtoAUD);
+            const res = val * currentRate;
+            
+            const hasCents = res % 1 !== 0;
+            const formatted = res.toLocaleString(undefined, {
+                minimumFractionDigits: hasCents ? 2 : 0,
+                maximumFractionDigits: 2
+            });
+
+            document.getElementById('result').innerText = isMURtoAUD ? `$ ${formatted}` : `Rs ${formatted}`;
+        }
+
+        getRate();
+    </script>
+</body>
+</html>

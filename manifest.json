@@ -1,0 +1,16 @@
+{
+  "name": "MUR-AUD Converter",
+  "short_name": "Currency",
+  "start_url": "currency.html",
+  "display": "standalone",
+  "background_color": "#ea2330",
+  "theme_color": "#192061",
+  "icons": [
+    {
+      "src": "https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/512x512/1f1f2-1f1fa.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
