@@ -1,6 +1,6 @@
 name = "currencyswap"
 pages_build_output_dir = "."
 
-[site]
-bucket = "."
-entry-point = "index.html"
+# We removed [site] and entry-point to follow the new standard
+main = "index.html"
+compatibility_date = "2026-02-26"
