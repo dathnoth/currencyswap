@@ -4,3 +4,4 @@ pages_build_output_dir = "."
 # We removed [site] and entry-point to follow the new standard
 main = "index.html"
 compatibility_date = "2026-02-26"
+pages_build_output_dir = "."
