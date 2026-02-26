@@ -1,0 +1,6 @@
+name = "currencyswap"
+pages_build_output_dir = "."
+
+[site]
+bucket = "."
+entry-point = "index.html"
